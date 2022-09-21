@@ -11,27 +11,15 @@ def load_data() -> dict:
 class Question:
 
     def __init__(self, question_text, question_level, correct_answer):
-
         self.question_text = question_text
         self.question_level = question_level
         self.correct_answer = correct_answer
         self.was_question_asked = False
         self.user_answer = None
-        points_for_answer = 0
-        if self.question_level == "1":
-            points_for_answer = 10
-        elif self.question_level == "2":
-            points_for_answer = 20
-        elif self.question_level == "3":
-            points_for_answer = 30
-        elif self.question_level == "4":
-            points_for_answer = 40
-        elif self.question_level == "5":
-            points_for_answer = 50
-        self.points_for_answer = points_for_answer
+        self.points_for_answer = self.get_points()
 
-
-class Functions(Question):
+    def get_points(self):
+        return int(self.question_level) * 4
 
     def is_correct(self):
         if self.correct_answer == self.user_answer:
@@ -49,35 +37,32 @@ class Functions(Question):
             print(f"Ответ неверный, верный ответ {self.correct_answer}")
 
 
-def game_over(questions_list):
+def game_over(sum_of_points):
     print("Вот и всё!")
-    print(f"Отвечено {len(questions_list) - questions_list.count(0)} вопроса из {len(questions_list)}")
-    print(f"Набрано баллов {sum(questions_list)}")
+    print(f"Отвечено {len(sum_of_points) - sum_of_points.count(0)} вопроса из {len(sum_of_points)}")
+    print(f"Набрано баллов {sum(sum_of_points)}")
 
 
 def make_list():
     question_list = []
     for d in data_loaded:
-        question_list.append(Functions(d["q"], d["d"], d["a"]))
+        question_list.append(Question(d["q"], d["d"], d["a"]))
         random.shuffle(question_list)
     return question_list
 
 
 data_loaded = load_data()
-questions = []
-
+sum_of_points = []
 questions_orig = make_list()
-for i in questions_orig:
-    question1 = i
-    question1.build_question()
-    player_input = input()
-    question1.user_answer = player_input
-    if question1.is_correct():
-        questions.append(question1.points_for_answer)
-    else:
-        questions.append(0)
-    question1.build_feedback()
 
-print(questions)
-game_over(questions)
+for i in questions_orig:
+    i.build_question()
+    player_input = input()
+    i.user_answer = player_input
+    if i.is_correct():
+        sum_of_points.append(i.points_for_answer)
+    else:
+        sum_of_points.append(0)
+    i.build_feedback()
+game_over(sum_of_points)
 make_list()
